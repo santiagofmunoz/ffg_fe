@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "FFG",
+  "name": "Football Formation Generator",
   "icons": [
     {
       "src": "favicon.ico",

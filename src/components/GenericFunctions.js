@@ -7,7 +7,7 @@ class GenericFunctions {
 
     getGrammaticalGender(string) {
         const masculineWords = ["jugador"]
-        const feminineWords = ["carrera"]
+        const feminineWords = ["formación"]
         if (masculineWords.includes(string)) {
             return {created: "creado", the: "el"}
         } else if (feminineWords.includes(string)) {

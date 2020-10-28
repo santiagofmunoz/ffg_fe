@@ -67,6 +67,9 @@ function Header(props) {
                 <ListItem button key="create_player" onClick={() => handleNavigation("crear_jugador")}>
                     <ListItemText primary="Crear Jugador" />
                 </ListItem>
+                <ListItem button key="create_formation" onClick={() => handleNavigation("crear_formacion")}>
+                    <ListItemText primary="Crear Formacion" />
+                </ListItem>
             </List>
         </div>
     )

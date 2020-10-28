@@ -1,5 +1,4 @@
 import React, {useState, useEffect} from 'react'
-import {makeStyles} from "@material-ui/core/styles";
 import {
     Button,
     Container,
@@ -14,6 +13,7 @@ import {
     TextField,
     Typography
 } from "@material-ui/core";
+import {makeStyles} from "@material-ui/core/styles";
 import GenericFunctions from "./GenericFunctions";
 import PlayerService from './services/PlayerService'
 import PositionService from "./services/PositionService";
@@ -66,7 +66,7 @@ function CreatePlayer(props) {
             "player_last_name": playerLastName,
             "position": position,
         }
-        playerService.createPlayer(playerObj).then((result) => {
+        playerService.createPlayer(playerObj).then(() => {
             genericFunctions.successMessage("jugador")
         }).catch(() => {
             genericFunctions.errorMessage("jugador")

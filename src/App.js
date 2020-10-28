@@ -7,6 +7,7 @@ import {
 import {createMuiTheme, MuiThemeProvider} from "@material-ui/core";
 import Header from "./components/Header";
 import CreatePlayer from "./components/CreatePlayer";
+import CreateFormation from "./components/CreateFormation";
 
 const darkTheme = createMuiTheme({
   palette: {
@@ -23,6 +24,9 @@ function App() {
             <Switch>
               <Route path="/crear_jugador">
                 <CreatePlayer />
+              </Route>
+              <Route path="/crear_formacion">
+                <CreateFormation />
               </Route>
             </Switch>
           </Router>

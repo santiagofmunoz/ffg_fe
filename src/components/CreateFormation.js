@@ -1,20 +1,23 @@
 import React, {useEffect, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {
-    Container,
+    Button,
+    Container, createMuiTheme,
     FormControl,
     Grid,
     InputLabel,
-    MenuItem,
+    MenuItem, MuiThemeProvider,
     Select,
     TextField,
     Typography
 } from "@material-ui/core";
 import FormationService from "./services/FormationService";
 import GenericFunctions from "./GenericFunctions";
+import PlayerService from "./services/PlayerService";
 
-const genericFunctions = new GenericFunctions();
 const formationService = new FormationService();
+const genericFunctions = new GenericFunctions();
+const playerService = new PlayerService();
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -35,12 +38,33 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+const submitButton = createMuiTheme({
+    palette: {
+        primary: {500: "#245b80"}
+    },
+})
+
 function CreateFormation(props) {
     const classes = useStyles();
     const [formationName, setFormationName] = useState("");
     const [numDefenders, setNumDefenders] = useState(0);
     const [numMidfielders, setNumMidfielders] = useState(0);
     const [numForwards, setNumForwards] = useState(0);
+    const [goalkeeperList, setGoalkeeperList] = useState([]);
+    // const [defendersList, setDefendersList] = useState([]);
+    // const [midfieldersList, setMidfieldersList] = useState([]);
+    // const [forwardsList, setForwardsList] = useState([]);
+    const [goalkeeper, setGoalkeeper] = useState({});
+    // const [player1, setPlayer1] = useState({});
+    // const [player2, setPlayer2] = useState({});
+    // const [player3, setPlayer3] = useState({});
+    // const [player4, setPlayer4] = useState({});
+    // const [player5, setPlayer5] = useState({});
+    // const [player6, setPlayer6] = useState({});
+    // const [player7, setPlayer7] = useState({});
+    // const [player8, setPlayer8] = useState({});
+    // const [player9, setPlayer9] = useState({});
+    // const [player10, setPlayer10] = useState({});
     const [disabledOptions, setDisabledOptions] = useState(11);
     const totalPlayers = 10;
     const maxPlayersOptions = Array.from({length: totalPlayers}, (x, i) => i+1);
@@ -49,6 +73,12 @@ function CreateFormation(props) {
     useEffect(() => {
         setDisabledOptions(remainingPlayers);
     }, [numDefenders, numMidfielders, numForwards, remainingPlayers]);
+
+    useEffect(() => {
+        playerService.get_players_by_position_type("GOL").then((result) => {
+            setGoalkeeperList(result.data)
+        })
+    }, [])
 
     function handleSubmit(event) {
         const formationObj = {
@@ -62,6 +92,7 @@ function CreateFormation(props) {
         }).catch(() => {
             genericFunctions.errorMessage("formación");
         })
+        event.preventDefault();
     }
 
     return(
@@ -153,6 +184,39 @@ function CreateFormation(props) {
                                 </Select>
                             </FormControl>
                         </Grid>
+                        <Grid item xs={12}>
+                            <FormControl required variant="outlined" className={classes.formControl}>
+                                <InputLabel id="goalkeeper-label">Golero</InputLabel>
+                                <Select
+                                    labelId="goalkeeper-label"
+                                    id="goalkeeper"
+                                    value={goalkeeper}
+                                    onChange={e => setGoalkeeper(e.target.value)}
+                                    label="Golero"
+                                >
+                                    <MenuItem key="default" value="default" disabled>
+                                        Seleccione una opción
+                                    </MenuItem>
+                                    {goalkeeperList.map(element => (
+                                        <MenuItem key={element.player_id}
+                                                  value={element.player_id}>
+                                            {element.player_first_name} {element.player_last_name} - {element.position.position_name}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                        <MuiThemeProvider theme={submitButton}>
+                            <Button
+                                type="submit"
+                                fullWidth
+                                variant="contained"
+                                color="primary"
+                                className={classes.submit}
+                            >
+                                Crear formación
+                            </Button>
+                        </MuiThemeProvider>
                     </Grid>
                 </form>
             </div>

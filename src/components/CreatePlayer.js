@@ -122,7 +122,7 @@ function CreatePlayer(props) {
                                         Seleccione una opción
                                     </MenuItem>
                                     {position_list.map(element => (
-                                        <MenuItem key={element.pk} value={element.pk}>
+                                        <MenuItem key={element.position_id} value={element.position_id}>
                                             {element.type} - {element.position_name}
                                         </MenuItem>
                                     ))}

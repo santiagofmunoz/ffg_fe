@@ -14,6 +14,7 @@ import {
 import FormationService from "./services/FormationService";
 import GenericFunctions from "./GenericFunctions";
 import PlayerService from "./services/PlayerService";
+import PlayersSelect from "./PlayersSelect";
 
 const formationService = new FormationService();
 const genericFunctions = new GenericFunctions();
@@ -51,20 +52,12 @@ function CreateFormation(props) {
     const [numMidfielders, setNumMidfielders] = useState(0);
     const [numForwards, setNumForwards] = useState(0);
     const [goalkeeperList, setGoalkeeperList] = useState([]);
-    // const [defendersList, setDefendersList] = useState([]);
-    // const [midfieldersList, setMidfieldersList] = useState([]);
-    // const [forwardsList, setForwardsList] = useState([]);
-    const [goalkeeper, setGoalkeeper] = useState({});
-    // const [player1, setPlayer1] = useState({});
-    // const [player2, setPlayer2] = useState({});
-    // const [player3, setPlayer3] = useState({});
-    // const [player4, setPlayer4] = useState({});
-    // const [player5, setPlayer5] = useState({});
-    // const [player6, setPlayer6] = useState({});
-    // const [player7, setPlayer7] = useState({});
-    // const [player8, setPlayer8] = useState({});
-    // const [player9, setPlayer9] = useState({});
-    // const [player10, setPlayer10] = useState({});
+    const [defendersList, setDefendersList] = useState([]);
+    const [midfieldersList, setMidfieldersList] = useState([]);
+    const [forwardsList, setForwardsList] = useState([]);
+    const [players, setPlayers] = useState({
+        goalkeeper: {},
+    });
     const [disabledOptions, setDisabledOptions] = useState(11);
     const totalPlayers = 10;
     const maxPlayersOptions = Array.from({length: totalPlayers}, (x, i) => i+1);
@@ -75,19 +68,32 @@ function CreateFormation(props) {
     }, [numDefenders, numMidfielders, numForwards, remainingPlayers]);
 
     useEffect(() => {
-        playerService.get_players_by_position_type("GOL").then((result) => {
-            setGoalkeeperList(result.data)
+        playerService.get_players_position_detail().then((result) => {
+            const data = result.data
+            for(let i = 0; i < data.length; i++) {
+                const element = data[i]
+                if(element.position.type === "GOL") {
+                    setGoalkeeperList(prevState => ([...prevState, element]))
+                } else if (data[i].position.type === "DEF") {
+                    setDefendersList(prevState => ([...prevState, element]))
+                } else if (data[i].position.type === "MED") {
+                    setMidfieldersList(prevState => ([...prevState, element]))
+                } else if (data[i].position.type === "DEL") {
+                    setForwardsList(prevState => ([...prevState, element]))
+                }
+            }
         })
     }, [])
 
-    function handleSubmit(event) {
+    const handleSubmit = (event) => {
         const formationObj = {
             "formation_name": formationName,
             "num_def": numDefenders,
             "num_mid": numMidfielders,
             "num_fwd": numForwards,
+            "players": players,
         }
-        formationService.create_formation(formationObj).then((result) => {
+        formationService.create_formation(formationObj).then(() => {
             genericFunctions.successMessage("formación");
         }).catch(() => {
             genericFunctions.errorMessage("formación");
@@ -96,7 +102,7 @@ function CreateFormation(props) {
     }
 
     return(
-        <Container maxWidth="md">
+        <Container maxWidth="sm">
             <div className={classes.paper}>
                 <Typography component="h1" variant="h5">
                     Crear formación
@@ -121,7 +127,7 @@ function CreateFormation(props) {
                                 <Select
                                     labelId="numdefenders-label"
                                     id="numDefenders"
-                                    value={numDefenders}
+                                    value={numDefenders ? numDefenders : ""}
                                     onChange={e => setNumDefenders(e.target.value)}
                                     label="N° Defensas"
                                 >
@@ -144,7 +150,7 @@ function CreateFormation(props) {
                                 <Select
                                     labelId="nummidfielders-label"
                                     id="numMidfielders"
-                                    value={numMidfielders}
+                                    value={numMidfielders ? numMidfielders : ""}
                                     onChange={e => setNumMidfielders(e.target.value)}
                                     label="N° Mediocampistas"
                                 >
@@ -167,7 +173,7 @@ function CreateFormation(props) {
                                 <Select
                                     labelId="numforwards-label"
                                     id="numForwards"
-                                    value={numForwards}
+                                    value={numForwards ? numForwards : ""}
                                     onChange={e => setNumForwards(e.target.value)}
                                     label="N° Delanteros"
                                 >
@@ -190,8 +196,8 @@ function CreateFormation(props) {
                                 <Select
                                     labelId="goalkeeper-label"
                                     id="goalkeeper"
-                                    value={goalkeeper}
-                                    onChange={e => setGoalkeeper(e.target.value)}
+                                    value={players.goalkeeper}
+                                    onChange={e => setPlayers(prevState => ({...players, goalkeeper: e.target.value}))}
                                     label="Golero"
                                 >
                                     <MenuItem key="default" value="default" disabled>
@@ -206,6 +212,40 @@ function CreateFormation(props) {
                                 </Select>
                             </FormControl>
                         </Grid>
+                        {
+                            Array.from({length: numDefenders}, (x, i) => i + 1).map((element) =>
+                                <PlayersSelect
+                                    formControl={classes.formControl}
+                                    playerNum={element}
+                                    playerType="Defensa"
+                                    setPlayerValue={setPlayers}
+                                    playersList={defendersList}
+                                />
+                            )
+                        }
+                        {
+                            Array.from({length: numMidfielders}, (x, i) => i + numDefenders + 1).map((element) =>
+                                <PlayersSelect
+                                    formControl={classes.formControl}
+                                    playerNum={element}
+                                    playerType="Mediocampista"
+                                    setPlayerValue={setPlayers}
+                                    playersList={midfieldersList}
+                                />
+                            )
+                        }
+                        {
+                            Array.from({length: numForwards}, (x, i) => i + numDefenders + numMidfielders + 1).map((element) =>
+                                <PlayersSelect
+                                    formControl={classes.formControl}
+                                    playerNum={element}
+                                    playerType="Delantero"
+                                    setPlayerValue={setPlayers}
+                                    playersList={forwardsList}
+                                />
+                            )
+                        }
+
                         <MuiThemeProvider theme={submitButton}>
                             <Button
                                 type="submit"

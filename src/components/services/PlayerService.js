@@ -8,8 +8,8 @@ class PlayerService {
         return axios.post(url, player);
     }
 
-    get_players_by_position_type(position_type) {
-        const url = `${API_URL}/api/formation/get_players_by_position_type/${position_type}`;
+    get_players_position_detail() {
+        const url = `${API_URL}/api/formation/get_players_position_detail/`;
         return axios.get(url);
     }
 }

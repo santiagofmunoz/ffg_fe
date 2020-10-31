@@ -51,7 +51,7 @@ function CreatePlayer(props) {
     const classes = useStyles();
     const [playerFirstName, setPlayerFirstName] = useState(null);
     const [playerLastName, setPlayerLastName] = useState(null);
-    const [position, setPosition] = useState("");
+    const [positionId, setPositionId] = useState("");
     const [position_list, setPositionList] = useState([]);
 
     useEffect(() => {
@@ -64,7 +64,7 @@ function CreatePlayer(props) {
         const playerObj = {
             "player_first_name": playerFirstName,
             "player_last_name": playerLastName,
-            "position": position,
+            "position": positionId,
         }
         playerService.createPlayer(playerObj).then(() => {
             genericFunctions.successMessage("jugador")
@@ -114,8 +114,8 @@ function CreatePlayer(props) {
                                 <Select
                                     labelId="position-label"
                                     id="position"
-                                    value={position}
-                                    onChange={e => setPosition(e.target.value)}
+                                    value={positionId}
+                                    onChange={e => setPositionId(e.target.value)}
                                     label="Posición"
                                 >
                                     <MenuItem key="default" value="" disabled>

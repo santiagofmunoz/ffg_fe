@@ -75,7 +75,7 @@ function CreatePlayer(props) {
     }
 
     return (
-        <Container maxWidth="sm">
+        <Container maxWidth="md">
             <CssBaseline />
             <div className={classes.paper}>
                 <Typography component="h1" variant="h5">

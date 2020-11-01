@@ -70,6 +70,9 @@ function Header(props) {
                 <ListItem button key="create_formation" onClick={() => handleNavigation("crear_formacion")}>
                     <ListItemText primary="Crear Formacion" />
                 </ListItem>
+                <ListItem button key="view_formations" onClick={() => handleNavigation("visualizar_formaciones")}>
+                    <ListItemText primary="Visualizar Formaciones" />
+                </ListItem>
             </List>
         </div>
     )

@@ -102,7 +102,7 @@ function CreateFormation(props) {
     }
 
     return(
-        <Container maxWidth="sm">
+        <Container maxWidth="md">
             <div className={classes.paper}>
                 <Typography component="h1" variant="h5">
                     Crear formación

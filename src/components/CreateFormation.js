@@ -58,8 +58,10 @@ function CreateFormation() {
     const [numMidfielders, setNumMidfielders] = useState(0);
     // State to save the number of forwards
     const [numForwards, setNumForwards] = useState(0);
+    // State to save the list of all coaches in the system
+    const [coachesList, setCoachesList] = useState([]);
     // State to save the list of all goalkeepers in the system
-    const [goalkeeperList, setGoalkeeperList] = useState([]);
+    const [goalkeepersList, setGoalkeepersList] = useState([]);
     // State to save the list of all defenders in the system
     const [defendersList, setDefendersList] = useState([]);
     // State to save the list of all midfielders in the system
@@ -68,6 +70,7 @@ function CreateFormation() {
     const [forwardsList, setForwardsList] = useState([]);
     // State to save the list of all the selected players to be later saved in the system
     const [players, setPlayers] = useState({
+        coach: "",
         goalkeeper: "",
     });
     // State to manage the amount of enabled options in the selects of numDefenders, numMidfielders and numForwards
@@ -99,14 +102,22 @@ function CreateFormation() {
             const data = result.data
             for(let i = 0; i < data.length; i++) {
                 const element = data[i]
-                if(element.position.type === "GOL") {
-                    setGoalkeeperList(prevState => ([...prevState, element]))
-                } else if (data[i].position.type === "DEF") {
-                    setDefendersList(prevState => ([...prevState, element]))
-                } else if (data[i].position.type === "MED") {
-                    setMidfieldersList(prevState => ([...prevState, element]))
-                } else if (data[i].position.type === "DEL") {
-                    setForwardsList(prevState => ([...prevState, element]))
+                switch (element.position.type) {
+                    case "DIR":
+                        setCoachesList(prevState => ([...prevState, element]))
+                        break;
+                    case "GOL":
+                        setGoalkeepersList(prevState => ([...prevState, element]))
+                        break;
+                    case "DEF":
+                        setDefendersList(prevState => ([...prevState, element]))
+                        break;
+                    case "MED":
+                        setMidfieldersList(prevState => ([...prevState, element]))
+                        break;
+                    case "DEL":
+                        setForwardsList(prevState => ([...prevState, element]))
+                        break;
                 }
             }
         }).catch(() => {
@@ -225,6 +236,28 @@ function CreateFormation() {
                         </Grid>
                         <Grid item xs={12}>
                             <FormControl required variant="outlined" className={classes.formControl}>
+                                <InputLabel id="coach-label">Director Técnico</InputLabel>
+                                <Select
+                                    labelId="coach-label"
+                                    id="coach"
+                                    value={players.coach}
+                                    onChange={e => setPlayers(prevState => ({...prevState, coach: e.target.value}))}
+                                    label="Director Técnico"
+                                >
+                                    <MenuItem key="default" value="default" disabled>
+                                        Seleccione una opción
+                                    </MenuItem>
+                                    {coachesList.map(element => (
+                                        <MenuItem key={element.player_id}
+                                                  value={element.player_id}>
+                                            {element.player_first_name} {element.player_last_name} - {element.position.position_name}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <FormControl required variant="outlined" className={classes.formControl}>
                                 <InputLabel id="goalkeeper-label">Golero</InputLabel>
                                 <Select
                                     labelId="goalkeeper-label"
@@ -236,7 +269,7 @@ function CreateFormation() {
                                     <MenuItem key="default" value="default" disabled>
                                         Seleccione una opción
                                     </MenuItem>
-                                    {goalkeeperList.map(element => (
+                                    {goalkeepersList.map(element => (
                                         <MenuItem key={element.player_id}
                                                   value={element.player_id}>
                                             {element.player_first_name} {element.player_last_name} - {element.position.position_name}

@@ -17,6 +17,7 @@ import {
 } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu"
 
+// CSS Styles for the page
 const useStyles = makeStyles((theme) => ({
     headerRoot: {
         flexGrow: 1,
@@ -37,19 +38,25 @@ const useStyles = makeStyles((theme) => ({
     toolbar: theme.mixins.toolbar,
 }));
 
-function Header(props) {
+function Header() {
+    // Instance to use the react-router hook useHistory
     const history = useHistory();
+    // Instance to use the styles
     const classes = useStyles();
+    // Instance to use the Material UI hook useTheme
     const theme = useTheme();
     const [state, setState] = React.useState({left: false})
+    // Manages the state of the drawer
     const toggleDrawer = (anchor, open) => (event) => {
         if (event && event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
             return;
         }
         setState({...state, [anchor]: open });
     }
+    // Checks which header text to use based on the window size.
     const headerText = useMediaQuery(theme.breakpoints.up('sm')) ? "Football Formation Generator" : "FFG";
 
+    // Routes the user to the location given in the parameter
     function handleNavigation(to) {
         history.push("/" + to)
     }

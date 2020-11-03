@@ -22,6 +22,7 @@ const genericFunctions = new GenericFunctions();
 const playerService = new PlayerService();
 const positionService = new PositionService();
 
+// CSS Styles for the page
 const useStyles = makeStyles((theme) => ({
     paper: {
         marginTop: theme.spacing(8),
@@ -41,25 +42,39 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+// CSS for the submit button
 const submitButton = createMuiTheme({
     palette: {
         primary: {500: "#245b80"}
     },
 })
 
-function CreatePlayer(props) {
+function CreatePlayer() {
+    // Instance to use the styles
     const classes = useStyles();
+    // State to save player's first name
     const [playerFirstName, setPlayerFirstName] = useState(null);
+    // State to save player's last name
     const [playerLastName, setPlayerLastName] = useState(null);
+    // State to save player's position
     const [positionId, setPositionId] = useState("");
-    const [position_list, setPositionList] = useState([]);
+    // State to save all the positions saved in the system
+    const [positionList, setPositionList] = useState([]);
 
+    /*
+        Gets all the positions saved in the system and then sets the object in positionList.
+        This effect runs only in the first render
+     */
     useEffect(() => {
         positionService.get_positions().then((result) => {
             setPositionList(result.data)
         })
     }, [])
 
+    /*
+        Creates an object with all the information needed to be sent to the server and makes the API call.
+        If everything goes well, a success message is returned. Otherwise, an error message is returned
+     */
     function handleSubmit(event) {
         const playerObj = {
             "player_first_name": playerFirstName,
@@ -67,9 +82,9 @@ function CreatePlayer(props) {
             "position": positionId,
         }
         playerService.createPlayer(playerObj).then(() => {
-            genericFunctions.successMessage("jugador")
+            genericFunctions.creationSuccessMessage("jugador")
         }).catch(() => {
-            genericFunctions.errorMessage("jugador")
+            genericFunctions.creationErrorMessage("jugador")
         })
         event.preventDefault();
     }
@@ -121,7 +136,7 @@ function CreatePlayer(props) {
                                     <MenuItem key="default" value="" disabled>
                                         Seleccione una opción
                                     </MenuItem>
-                                    {position_list.map(element => (
+                                    {positionList.map(element => (
                                         <MenuItem key={element.position_id} value={element.position_id}>
                                             {element.type} - {element.position_name}
                                         </MenuItem>

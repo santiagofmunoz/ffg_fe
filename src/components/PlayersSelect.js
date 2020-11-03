@@ -7,7 +7,27 @@ import {
     Select
 } from "@material-ui/core";
 
+/*
+    Component to create every select in CreateFormation depending on the player type.
+    Props needed: formControl, playerNum, playerType, setPlayerValue, playersList, selectedPlayersList
+ */
 function PlayersSelect(props) {
+
+    // TODO: Optimise this piece of code. It lacks of the validation of no repetition of position.
+    const checkSelectedPlayers = (player_id) => {
+        // Selected Players List
+        const spl = props.selectedPlayersList
+        /*
+            For every player selected, we check if the player id has been selected, and if it has, we disable the
+            option in every select.
+         */
+        for(let splElement in spl) {
+            if(player_id === spl[splElement]) {
+                return true
+            }
+        }
+    }
+
     return (
         <Grid item xs={12}>
             <FormControl required variant="outlined" className={props.formControl}>
@@ -24,7 +44,9 @@ function PlayersSelect(props) {
                     </MenuItem>
                     {props.playersList.map(element => (
                         <MenuItem key={element.player_id}
-                                  value={element.player_id}>
+                                  value={element.player_id}
+                                  disabled={checkSelectedPlayers(element.player_id)}
+                        >
                             {element.player_first_name} {element.player_last_name} - {element.position.position_name}
                         </MenuItem>
                     ))}

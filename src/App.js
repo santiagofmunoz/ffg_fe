@@ -10,6 +10,7 @@ import CreatePlayer from "./components/CreatePlayer";
 import CreateFormation from "./components/CreateFormation";
 import ViewFormations from "./components/ViewFormations";
 
+// Sets Dark Mode in all the page. #DarkModeAllTheThings
 const darkTheme = createMuiTheme({
   palette: {
     type: 'dark',

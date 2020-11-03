@@ -20,6 +20,7 @@ const formationService = new FormationService();
 const genericFunctions = new GenericFunctions();
 const playerService = new PlayerService();
 
+// CSS Styles for the page
 const useStyles = makeStyles((theme) => ({
     paper: {
         marginTop: theme.spacing(8),
@@ -39,34 +40,60 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+// CSS for the submit button
 const submitButton = createMuiTheme({
     palette: {
         primary: {500: "#245b80"}
     },
 })
 
-function CreateFormation(props) {
+function CreateFormation() {
+    // Instance to use the styles
     const classes = useStyles();
+    // State to save the formation name
     const [formationName, setFormationName] = useState("");
+    // State to save the number of defenders
     const [numDefenders, setNumDefenders] = useState(0);
+    // State to save the number of midfielders
     const [numMidfielders, setNumMidfielders] = useState(0);
+    // State to save the number of forwards
     const [numForwards, setNumForwards] = useState(0);
+    // State to save the list of all goalkeepers in the system
     const [goalkeeperList, setGoalkeeperList] = useState([]);
+    // State to save the list of all defenders in the system
     const [defendersList, setDefendersList] = useState([]);
+    // State to save the list of all midfielders in the system
     const [midfieldersList, setMidfieldersList] = useState([]);
+    // State to save the list of all forwards in the system
     const [forwardsList, setForwardsList] = useState([]);
+    // State to save the list of all the selected players to be later saved in the system
     const [players, setPlayers] = useState({
-        goalkeeper: {},
+        goalkeeper: "",
     });
-    const [disabledOptions, setDisabledOptions] = useState(11);
+    // State to manage the amount of enabled options in the selects of numDefenders, numMidfielders and numForwards
+    const [enabledOptions, setEnabledOptions] = useState(11);
+    // Number of players in a field excluding the goalkeeper
     const totalPlayers = 10;
+    /*
+        Creates an array to enumerate the number of options available to the selects of numDefenders, numMidfielders and
+        numForwards
+     */
     const maxPlayersOptions = Array.from({length: totalPlayers}, (x, i) => i+1);
+    // Amount of players left to be selected
     let remainingPlayers = totalPlayers - numDefenders - numMidfielders - numForwards
 
+    /*
+        Every time numDefenders, numMidfielders or numForwards value change,
+        it shall also change the value of enabledOptions
+     */
     useEffect(() => {
-        setDisabledOptions(remainingPlayers);
+        setEnabledOptions(remainingPlayers);
     }, [numDefenders, numMidfielders, numForwards, remainingPlayers]);
 
+    /*
+        Gets all the players in the system and saves them in a list based on their position. If anything happens, an
+        error message is returned.
+     */
     useEffect(() => {
         playerService.get_players_position_detail().then((result) => {
             const data = result.data
@@ -82,9 +109,15 @@ function CreateFormation(props) {
                     setForwardsList(prevState => ([...prevState, element]))
                 }
             }
+        }).catch(() => {
+            genericFunctions.getDataErrorMessage("jugadores");
         })
     }, [])
 
+    /*
+        Creates an object with all the information needed to be sent to the server and makes the API call.
+        If everything goes well, a success message is returned. Otherwise, an error message is returned
+     */
     const handleSubmit = (event) => {
         const formationObj = {
             "formation_name": formationName,
@@ -94,9 +127,9 @@ function CreateFormation(props) {
             "players": players,
         }
         formationService.create_formation(formationObj).then(() => {
-            genericFunctions.successMessage("formación");
+            genericFunctions.creationSuccessMessage("formación");
         }).catch(() => {
-            genericFunctions.errorMessage("formación");
+            genericFunctions.creationErrorMessage("formación");
         })
         event.preventDefault();
     }
@@ -137,7 +170,7 @@ function CreateFormation(props) {
                                     {maxPlayersOptions.map(element => (
                                         <MenuItem key={element}
                                                   value={element}
-                                                  disabled={element > disabledOptions && element > numDefenders + remainingPlayers}>
+                                                  disabled={element > enabledOptions && element > numDefenders + remainingPlayers}>
                                             {element}
                                         </MenuItem>
                                     ))}
@@ -160,7 +193,7 @@ function CreateFormation(props) {
                                     {maxPlayersOptions.map(element => (
                                         <MenuItem key={element}
                                                   value={element}
-                                                  disabled={element > disabledOptions && element > numMidfielders + remainingPlayers}>
+                                                  disabled={element > enabledOptions && element > numMidfielders + remainingPlayers}>
                                             {element}
                                         </MenuItem>
                                     ))}
@@ -183,7 +216,7 @@ function CreateFormation(props) {
                                     {maxPlayersOptions.map(element => (
                                         <MenuItem key={element}
                                                   value={element}
-                                                  disabled={element > disabledOptions && element > numForwards + remainingPlayers}>
+                                                  disabled={element > enabledOptions && element > numForwards + remainingPlayers}>
                                             {element}
                                         </MenuItem>
                                     ))}
@@ -197,7 +230,7 @@ function CreateFormation(props) {
                                     labelId="goalkeeper-label"
                                     id="goalkeeper"
                                     value={players.goalkeeper}
-                                    onChange={e => setPlayers(prevState => ({...players, goalkeeper: e.target.value}))}
+                                    onChange={e => setPlayers(prevState => ({...prevState, goalkeeper: e.target.value}))}
                                     label="Golero"
                                 >
                                     <MenuItem key="default" value="default" disabled>
@@ -213,6 +246,12 @@ function CreateFormation(props) {
                             </FormControl>
                         </Grid>
                         {
+                            /*
+                                Generate the amount of selects necessary based on the number of players selected for
+                                each position
+                             */
+                        }
+                        {
                             Array.from({length: numDefenders}, (x, i) => i + 1).map((element) =>
                                 <PlayersSelect
                                     formControl={classes.formControl}
@@ -220,6 +259,7 @@ function CreateFormation(props) {
                                     playerType="Defensa"
                                     setPlayerValue={setPlayers}
                                     playersList={defendersList}
+                                    selectedPlayersList={players}
                                 />
                             )
                         }
@@ -231,6 +271,7 @@ function CreateFormation(props) {
                                     playerType="Mediocampista"
                                     setPlayerValue={setPlayers}
                                     playersList={midfieldersList}
+                                    selectedPlayersList={players}
                                 />
                             )
                         }
@@ -242,6 +283,7 @@ function CreateFormation(props) {
                                     playerType="Delantero"
                                     setPlayerValue={setPlayers}
                                     playersList={forwardsList}
+                                    selectedPlayersList={players}
                                 />
                             )
                         }
